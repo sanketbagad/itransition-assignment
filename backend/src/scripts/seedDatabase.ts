@@ -1,167 +1,78 @@
 import mongoose from 'mongoose';
 import connectDB from '../config/database';
 import { Drug } from '../models/Drug';
+import { seedData } from '../data/seedData';
 
 /* eslint-disable no-console */
-
-// Sample drug data (you can expand this with your actual data)
-const drugData = [
-  {
-    code: 'DRUG001',
-    genericName: 'Acetaminophen',
-    brandName: 'Tylenol',
-    company: 'Johnson & Johnson',
-    launchDate: new Date('2000-01-15'),
-  },
-  {
-    code: 'DRUG002',
-    genericName: 'Ibuprofen',
-    brandName: 'Advil',
-    company: 'Pfizer',
-    launchDate: new Date('1998-03-22'),
-  },
-  {
-    code: 'DRUG003',
-    genericName: 'Aspirin',
-    brandName: 'Bayer Aspirin',
-    company: 'Bayer',
-    launchDate: new Date('1997-06-10'),
-  },
-  {
-    code: 'DRUG004',
-    genericName: 'Omeprazole',
-    brandName: 'Prilosec',
-    company: 'AstraZeneca',
-    launchDate: new Date('2001-11-08'),
-  },
-  {
-    code: 'DRUG005',
-    genericName: 'Metformin',
-    brandName: 'Glucophage',
-    company: 'Bristol-Myers Squibb',
-    launchDate: new Date('1999-09-14'),
-  },
-  {
-    code: 'DRUG006',
-    genericName: 'Atorvastatin',
-    brandName: 'Lipitor',
-    company: 'Pfizer',
-    launchDate: new Date('2002-04-12'),
-  },
-  {
-    code: 'DRUG007',
-    genericName: 'Amlodipine',
-    brandName: 'Norvasc',
-    company: 'Pfizer',
-    launchDate: new Date('2000-08-07'),
-  },
-  {
-    code: 'DRUG008',
-    genericName: 'Lisinopril',
-    brandName: 'Prinivil',
-    company: 'Merck',
-    launchDate: new Date('1998-12-03'),
-  },
-  {
-    code: 'DRUG009',
-    genericName: 'Levothyroxine',
-    brandName: 'Synthroid',
-    company: 'AbbVie',
-    launchDate: new Date('2001-02-18'),
-  },
-  {
-    code: 'DRUG010',
-    genericName: 'Albuterol',
-    brandName: 'ProAir',
-    company: 'Teva Pharmaceutical',
-    launchDate: new Date('2003-05-25'),
-  },
-  {
-    code: 'DRUG011',
-    genericName: 'Gabapentin',
-    brandName: 'Neurontin',
-    company: 'Pfizer',
-    launchDate: new Date('1999-07-16'),
-  },
-  {
-    code: 'DRUG012',
-    genericName: 'Sertraline',
-    brandName: 'Zoloft',
-    company: 'Pfizer',
-    launchDate: new Date('2000-10-11'),
-  },
-  {
-    code: 'DRUG013',
-    genericName: 'Montelukast',
-    brandName: 'Singulair',
-    company: 'Merck',
-    launchDate: new Date('2002-01-29'),
-  },
-  {
-    code: 'DRUG014',
-    genericName: 'Furosemide',
-    brandName: 'Lasix',
-    company: 'Sanofi',
-    launchDate: new Date('1998-11-04'),
-  },
-  {
-    code: 'DRUG015',
-    genericName: 'Escitalopram',
-    brandName: 'Lexapro',
-    company: 'Forest Laboratories',
-    launchDate: new Date('2003-08-14'),
-  },
-  {
-    code: 'DRUG016',
-    genericName: 'Hydrochlorothiazide',
-    brandName: 'Microzide',
-    company: 'Watson Pharmaceuticals',
-    launchDate: new Date('1997-04-22'),
-  },
-  {
-    code: 'DRUG017',
-    genericName: 'Losartan',
-    brandName: 'Cozaar',
-    company: 'Merck',
-    launchDate: new Date('2001-09-07'),
-  },
-  {
-    code: 'DRUG018',
-    genericName: 'Azithromycin',
-    brandName: 'Zithromax',
-    company: 'Pfizer',
-    launchDate: new Date('1999-03-12'),
-  },
-  {
-    code: 'DRUG019',
-    genericName: 'Simvastatin',
-    brandName: 'Zocor',
-    company: 'Merck',
-    launchDate: new Date('2000-06-28'),
-  },
-  {
-    code: 'DRUG020',
-    genericName: 'Pantoprazole',
-    brandName: 'Protonix',
-    company: 'Wyeth',
-    launchDate: new Date('2002-12-15'),
-  },
-];
 
 export async function seedDatabase(): Promise<void> {
   try {
     console.log('🌱 Starting database seeding...');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log(
+      'MongoDB URI:',
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/drug_inventory'
+    );
 
     // Connect to database
     await connectDB();
+    console.log('✅ Connected to database');
 
     // Clear existing data
     await Drug.deleteMany({});
     console.log('🗑️  Cleared existing drug data');
 
-    // Insert new data
-    const insertedDrugs = await Drug.insertMany(drugData);
-    console.log(`✅ Successfully seeded ${insertedDrugs.length} drugs`);
+    console.log(`📥 Preparing to seed ${seedData.length} drugs...`);
+
+    // Transform the JSON data to match our schema
+    const transformedData = seedData.map(drug => ({
+      code: drug.code,
+      genericName: drug.genericName,
+      brandName: drug.brandName,
+      company: drug.company,
+      launchDate: new Date(drug.launchDate),
+    }));
+
+    console.log('🔄 Inserting drugs...');
+    // Insert drugs one by one to handle duplicates gracefully
+    let insertedCount = 0;
+    let updatedCount = 0;
+
+    for (const drugData of transformedData) {
+      try {
+        // Check if drug already exists
+        const existingDrug = await Drug.findOne({ code: drugData.code });
+
+        if (existingDrug) {
+          // Update existing drug
+          await Drug.findOneAndUpdate({ code: drugData.code }, drugData, {
+            new: true,
+          });
+          updatedCount++;
+        } else {
+          // Insert new drug
+          await Drug.create(drugData);
+          insertedCount++;
+        }
+
+        // Log progress every 100 records
+        if ((insertedCount + updatedCount) % 100 === 0) {
+          console.log(
+            `   ✅ Processed ${insertedCount + updatedCount} records...`
+          );
+        }
+      } catch (error) {
+        console.log(
+          `   ⚠️  Error with ${drugData.code}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+      }
+    }
+
+    console.log(
+      `✅ Successfully processed ${insertedCount + updatedCount} drugs`
+    );
+    console.log(`   📝 Inserted: ${insertedCount}`);
+    console.log(`   🔄 Updated: ${updatedCount}`);
 
     // Display some statistics
     const totalDrugs = await Drug.countDocuments();
@@ -170,7 +81,9 @@ export async function seedDatabase(): Promise<void> {
     console.log(`📊 Database Statistics:`);
     console.log(`   - Total drugs: ${totalDrugs}`);
     console.log(`   - Unique companies: ${uniqueCompanies.length}`);
-    console.log(`   - Companies: ${uniqueCompanies.join(', ')}`);
+    console.log(
+      `   - Companies: ${uniqueCompanies.slice(0, 5).join(', ')}${uniqueCompanies.length > 5 ? '...' : ''}`
+    );
 
     console.log('🎉 Database seeding completed successfully!');
   } catch (error) {
@@ -186,7 +99,7 @@ export async function seedDatabase(): Promise<void> {
 if (require.main === module) {
   seedDatabase()
     .then(() => {
-      console.log('✅ Seeding process completed');
+      console.log('✅ Seeding process completed successfully!');
       process.exit(0);
     })
     .catch(error => {
