@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import connectDB from '../config/database';
 import { Drug } from '../models/Drug';
 
+/* eslint-disable no-console */
+
 // Sample drug data (you can expand this with your actual data)
 const drugData = [
   {
@@ -149,27 +151,27 @@ const drugData = [
 export async function seedDatabase(): Promise<void> {
   try {
     console.log('🌱 Starting database seeding...');
-    
+
     // Connect to database
     await connectDB();
-    
+
     // Clear existing data
     await Drug.deleteMany({});
     console.log('🗑️  Cleared existing drug data');
-    
+
     // Insert new data
     const insertedDrugs = await Drug.insertMany(drugData);
     console.log(`✅ Successfully seeded ${insertedDrugs.length} drugs`);
-    
+
     // Display some statistics
     const totalDrugs = await Drug.countDocuments();
     const uniqueCompanies = await Drug.distinct('company');
-    
+
     console.log(`📊 Database Statistics:`);
     console.log(`   - Total drugs: ${totalDrugs}`);
     console.log(`   - Unique companies: ${uniqueCompanies.length}`);
     console.log(`   - Companies: ${uniqueCompanies.join(', ')}`);
-    
+
     console.log('🎉 Database seeding completed successfully!');
   } catch (error) {
     console.error('❌ Error seeding database:', error);
@@ -187,7 +189,7 @@ if (require.main === module) {
       console.log('✅ Seeding process completed');
       process.exit(0);
     })
-    .catch((error) => {
+    .catch(error => {
       console.error('❌ Seeding process failed:', error);
       process.exit(1);
     });

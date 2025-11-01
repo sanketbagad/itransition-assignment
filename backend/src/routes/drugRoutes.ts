@@ -21,7 +21,10 @@ router.get('/drugs', drugController.getDrugs.bind(drugController));
  * @description Get table configuration for frontend
  * @returns {Object} Table configuration with columns, sorting, pagination settings
  */
-router.get('/table-config', drugController.getTableConfiguration.bind(drugController));
+router.get(
+  '/table-config',
+  drugController.getTableConfiguration.bind(drugController)
+);
 
 /**
  * @route GET /api/companies

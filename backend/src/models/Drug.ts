@@ -8,35 +8,38 @@ export interface IDrug extends Document {
   launchDate: Date;
 }
 
-const drugSchema: Schema = new Schema({
-  code: {
-    type: String,
-    required: true,
-    unique: true,
-    index: true,
+const drugSchema: Schema = new Schema(
+  {
+    code: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    genericName: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    brandName: {
+      type: String,
+      required: true,
+    },
+    company: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    launchDate: {
+      type: Date,
+      required: true,
+      index: true,
+    },
   },
-  genericName: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  brandName: {
-    type: String,
-    required: true,
-  },
-  company: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  launchDate: {
-    type: Date,
-    required: true,
-    index: true,
-  },
-}, {
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Create compound index for better query performance
 drugSchema.index({ company: 1, launchDate: -1 });

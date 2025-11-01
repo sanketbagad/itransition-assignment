@@ -53,7 +53,7 @@
       "npm run format:frontend"
     ],
     "backend/src/**/*.ts": [
-      "npm run lint:fix:backend",  
+      "npm run lint:fix:backend",
       "npm run format:backend"
     ]
   },

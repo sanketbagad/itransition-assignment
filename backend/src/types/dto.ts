@@ -14,7 +14,10 @@ export const getDrugsQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional().default(1),
   limit: z.coerce.number().int().positive().max(100).optional().default(20),
   company: z.string().optional(),
-  sortBy: z.enum(['code', 'name', 'company', 'launchDate']).optional().default('launchDate'),
+  sortBy: z
+    .enum(['code', 'name', 'company', 'launchDate'])
+    .optional()
+    .default('launchDate'),
   sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   search: z.string().optional(),
 });
