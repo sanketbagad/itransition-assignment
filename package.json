@@ -21,15 +21,41 @@
     "clean": "rimraf node_modules frontend/node_modules backend/node_modules frontend/dist backend/dist",
     "test": "cd backend && npm test",
     "test:frontend": "cd frontend && npm run lint",
-    "test:backend": "cd backend && npm test"
+    "test:backend": "cd backend && npm test",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "lint:fix": "npm run lint:fix:frontend && npm run lint:fix:backend",
+    "lint:fix:frontend": "cd frontend && npm run lint:fix",
+    "lint:fix:backend": "cd backend && npm run lint:fix",
+    "format": "npm run format:frontend && npm run format:backend",
+    "format:frontend": "cd frontend && npm run format",
+    "format:backend": "cd backend && npm run format",
+    "type-check": "npm run type-check:frontend && npm run type-check:backend",
+    "type-check:frontend": "cd frontend && npm run type-check",
+    "type-check:backend": "cd backend && npm run type-check",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
     "rimraf": "^5.0.5"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{ts,tsx}": [
+      "npm run lint:fix:frontend",
+      "npm run format:frontend"
+    ],
+    "backend/src/**/*.ts": [
+      "npm run lint:fix:backend",  
+      "npm run format:backend"
+    ]
   },
   "author": "Sanket Bagad",
   "license": "ISC"

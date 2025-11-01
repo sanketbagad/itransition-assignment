@@ -2,6 +2,8 @@
 
 A full-stack application for managing drug inventory with React frontend and Node.js/Express backend.
 
+**✅ Now with Husky pre-commit hooks for code quality!**
+
 ## Project Structure
 
 ```

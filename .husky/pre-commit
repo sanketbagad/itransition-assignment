@@ -1,0 +1,12 @@
+echo "🔍 Running pre-commit checks..."
+
+echo "📝 Type checking..."
+npm run type-check
+
+echo "🎨 Running lint-staged..."
+npx lint-staged
+
+echo "🧪 Running tests..."
+npm run test:backend
+
+echo "✅ Pre-commit checks passed!"
