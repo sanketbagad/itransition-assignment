@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import mongoose from 'mongoose';
 import { Drug } from '../models/Drug';
 import connectDB from '../config/database';
